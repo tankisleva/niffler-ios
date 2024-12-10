@@ -27,6 +27,52 @@ final class RegUITests: TestCase {
     }
     
     
+    //
+    func testCreateCategoryAfterReg() throws {
+        // Arrange
+        launchAppWithoutLogin()
+        
+        //act
+        tapCreateNewAccount()
+        fillRegForm(userName: uniqueUserName, password: uniquePassword, confirmPassword: uniquePassword)
+        logInInAlert()
+        assertFieldUserNameEqual(userName: uniqueUserName)
+        pressLoginButton()
+        assertIsAddSpendButtonShown()
+        assertEmptySpendItem()
+        addSpent()
+        addNewCategory()
+        inputNameCategory(nameCategory: "Еда")
+        inputAmount(amount: "1000")
+        inputDescription(description: "Бананы")
+        pressAddSpend()
+
+        // Assert
+        assertNewSpendIsShown(title: "Бананы")
+    }
+    
+    func testChooseCategoryAfterReg() throws {
+        // Arrange
+        launchAppWithoutLogin()
+        
+        //act
+        tapCreateNewAccount()
+        fillRegForm(userName: uniqueUserName, password: uniquePassword, confirmPassword: uniquePassword)
+        logInInAlert()
+        assertFieldUserNameEqual(userName: uniqueUserName)
+        pressLoginButton()
+        assertIsAddSpendButtonShown()
+        assertEmptySpendItem()
+        addSpent()
+        inputAmount(amount: "1000")
+        inputDescription(description: "Бананы")
+        pressAddSpend()
+
+        // Assert
+        assertNewSpendIsShown(title: "Бананы")
+    }
+    
+    
     private func input(username: String) {
         XCTContext.runActivity(named: "Заполняем поле userName \(username)") { _ in
             app.textFields["userNameTextField"].firstMatch.tap()
@@ -64,7 +110,10 @@ final class RegUITests: TestCase {
     
     private func closeKeyboards() {
         XCTContext.runActivity(named: "Закрываем клавиатуру") { _ in
-            app.keyboards.buttons["Return"].tap()
+            
+            if (app.keyboards.buttons["Return"].isHittable){
+                app.keyboards.buttons["Return"].tap()
+            }
         }
     }
     
@@ -109,14 +158,118 @@ final class RegUITests: TestCase {
     
     func assertIsAddSpendButtonShown(file: StaticString = #filePath, line: UInt = #line) {
         XCTContext.runActivity(named: "Жду кноку добавления траты") { _ in
-            let isAddSpendButton = app.buttons["addSpendButton"].waitForExistence(timeout: 3)
+            let isAddSpendButton = app.buttons["addSpendButton"].waitForExistence(timeout: 5)
             
             XCTAssertTrue(isAddSpendButton,
                           "Не нашли кнопку добавления траты",
                           file: file, line: line)
         }
     }
-        
-        
+    
+    func assertEmptySpendItem(file: StaticString = #filePath, line: UInt = #line) {
+        XCTContext.runActivity(named: "Жду кноку добавления траты") { _ in
+            XCTAssertEqual(app.scrollViews.switches.count, 0,
+                                        "Список трат не пустой!",
+                                        file: file, line: line)
+        }
     }
+    
+    
+    func inputSpent(description: String, amount: String) {
+        inputAmount(amount: amount)
+        selectCategory()
+        inputDescription(description: description)
+        pressAddSpend()
+    }
+    
+    func inputAmount(amount: String) {
+        XCTContext.runActivity(named: "Вводим сумму равную \(amount)") { _ in
+         app.textFields["amountField"].typeText(amount)
+        }
+    }
+    
+    
+    func addNewCategory(){
+        XCTContext.runActivity(named: "Жму кноку добавления новой категории") { _ in
+            app.buttons["+ New category"].tap()
+        }
+    }
+    
+    func inputNameCategory(nameCategory: String) {
+        XCTContext.runActivity(named: "Вводим название категории, равное  \(nameCategory)") { _ in
+            app.textFields["Name"].typeText(nameCategory)
+            app.buttons["Add"].firstMatch.tap()}
+        }
+    
+    
+
+    
+    func selectCategory() {
+        XCTContext.runActivity(named: "Выбираю категорию") { _ in
+         app.buttons["Select category"].tap()
+         app.buttons["Рыбалка"].tap()
+        }
+    }
+    
+    func inputDescription(description: String) {
+        XCTContext.runActivity(named: "Заполняю поле description, равное \(description)") { _ in
+            app.textFields["descriptionField"].tap()
+            app.textFields["descriptionField"].typeText(description)
+        }
+    }
+    
+    func inputDescription(amount: String) {
+        XCTContext.runActivity(named: "Заполняю поле amount, равное \(amount)") { _ in
+            app.textFields["descriptionField"].tap()
+            app.textFields["descriptionField"].typeText(description)
+        }
+    }
+    
+    func addSpent() {
+        XCTContext.runActivity(named: "Жму кноку добавления траты") { _ in
+            app.buttons["addSpendButton"].tap()
+        }
+    }
+    
+//    func swipeToAddSpendsButton() -> Self {
+//        let screenCenter = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+//        let screenTop = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.15))
+//        screenCenter.press(forDuration: 0.01, thenDragTo: screenTop)
+//        return self
+//    }
+    
+    func pressAddSpend() {
+        XCTContext.runActivity(named: "Нажимаю кнопку 'Add' для сохранения траты") { _ in
+            let addButton = app.buttons["Add"]
+            waitForElement(addButton, message: "'Add' button did not appear.")
+            addButton.tap()
+        }
+    }
+    
+    
+    private func waitForElement(_ element: XCUIElement, timeout: TimeInterval = 1, message: String, file: StaticString = #file, line: UInt = #line) {
+           XCTContext.runActivity(named: "Ожидание элемента") { _ in
+               XCTAssertTrue(element.waitForExistence(timeout: timeout), message, file: file, line: line)
+           }
+       }
+    
+    func assertNewSpendIsShown(title: String, file: StaticString = #filePath, line: UInt = #line) {
+        XCTContext.runActivity(named: "Проверяю, что новая трата с заголовком '\(title)' отображается в списке") { _ in
+            let spendTitle = app.firstMatch
+                .scrollViews.firstMatch
+                .staticTexts[title].firstMatch
+
+            waitForElement(spendTitle, timeout: 2, message: "Spend with title '\(title)' was not found in the list.")
+
+            XCTAssertTrue(spendTitle.exists, "Spend with title '\(title)' is not displayed in the list.", file: file, line: line)
+        }
+    }
+    
+    
+    
+       }
+
+
+
+
 
