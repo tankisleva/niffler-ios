@@ -28,11 +28,6 @@ final class SpendsUITests: TestCase {
     
     func testVerifyCategoryInProfileAfterAddingNewSpend() throws {
             XCTContext.runActivity(named: "Тест: проверка отображения новой категории в профиле после добавления траты") { _ in
-                let app = XCUIApplication()
-                let loginPage = LoginPage(app: app)
-                let regPage = RegPage(app: app)
-                let newSpendsPage = NewSpendPage(app: app)
-                let profilePage = ProfilePage(app: app)
 
 
                 // Arrange
@@ -40,57 +35,54 @@ final class SpendsUITests: TestCase {
                 
                 //act
                 regPage.tapCreateNewAccount()
-                regPage.fillRegForm(userName: uniqueUserName, password: uniquePassword, confirmPassword: uniquePassword)
+                       .fillRegForm(userName: uniqueUserName, password: uniquePassword, confirmPassword: uniquePassword)
                 loginPage.logInInAlert()
-                loginPage.assertFieldUserNameEqual(userName: uniqueUserName)
-                loginPage.pressLoginButton()
-                newSpendsPage.assertIsAddSpendButtonShown()
-                newSpendsPage.assertEmptySpendItem()
-                newSpendsPage.addSpent()
-                newSpendsPage.addNewCategory()
-                newSpendsPage.inputNameCategory(nameCategory: "Еда")
-                newSpendsPage.inputAmount(amount: "1000")
-                newSpendsPage.inputDescription(description: "Бананы")
-                newSpendsPage.pressAddSpend()
-                profilePage.goToProfile()
-
+                          .assertFieldUserNameEqual(userName: uniqueUserName)
+                           .pressLoginButton()
+                
+                newSpendPage.assertIsAddSpendButtonShown()
+                   .assertEmptySpendItem()
+                   .addSpent()
+                   .addNewCategory()
+                   .inputNameCategory(nameCategory: "Еда")
+                   .inputAmount(amount: "1000")
+                   .inputDescription(description: "Бананы")
+                   .pressAddSpend()
+                
                 // Assert
-                profilePage.verifyCategory("Еда")
+                profilePage.goToProfile()
+                    .verifyCategory("Еда")
             }
         }
 
         func testDeletedCategoryIsNotShownInSpendScreen() throws {
             XCTContext.runActivity(named: "Тест: проверка, что удалённая категория не отображается на экране добавления новой траты") { _ in
-                let app = XCUIApplication()
-                let loginPage = LoginPage(app: app)
-                let regPage = RegPage(app: app)
-                let newSpendsPage = NewSpendPage(app: app)
-                let profilePage = ProfilePage(app: app)
 
                 // Arrange
                 loginPage.launchAppWithoutLogin()
                 
                 //act
                 regPage.tapCreateNewAccount()
-                regPage.fillRegForm(userName: uniqueUserName, password: uniquePassword, confirmPassword: uniquePassword)
+                       .fillRegForm(userName: uniqueUserName, password: uniquePassword, confirmPassword: uniquePassword)
                 loginPage.logInInAlert()
-                loginPage.assertFieldUserNameEqual(userName: uniqueUserName)
-                loginPage.pressLoginButton()
-                newSpendsPage.assertIsAddSpendButtonShown()
-                newSpendsPage.assertEmptySpendItem()
-                newSpendsPage.addSpent()
-                newSpendsPage.addNewCategory()
-                newSpendsPage.inputNameCategory(nameCategory: "Еда")
-                newSpendsPage.inputAmount(amount: "1000")
-                newSpendsPage.inputDescription(description: "Бананы")
-                newSpendsPage.pressAddSpend()
+                         .assertFieldUserNameEqual(userName: uniqueUserName)
+                         .pressLoginButton()
+                newSpendPage.assertIsAddSpendButtonShown()
+                            .assertEmptySpendItem()
+                            .addSpent()
+                            .addNewCategory()
+                            .inputNameCategory(nameCategory: "Еда")
+                            .inputAmount(amount: "1000")
+                            .inputDescription(description: "Бананы")
+                            .pressAddSpend()
+                
                 profilePage.goToProfile()
-                profilePage.deleteCategory("Еда")
-                profilePage.closeProfile()
-                newSpendsPage.addSpent()
-
+                           .deleteCategory("Еда")
+                           .closeProfile()
+               
                 // Assert
-                newSpendsPage.verifyNewCategoryButtonIsVisibleAndTappable()
+                newSpendPage.addSpent()
+                             .verifyNewCategoryButtonIsVisibleAndTappable()
             }
         }
 }

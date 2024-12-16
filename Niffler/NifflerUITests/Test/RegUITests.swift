@@ -7,7 +7,7 @@
 
 import XCTest
 
-final class RegUITests: XCTestCase {
+final class RegUITests: TestCase {
     
     
     
@@ -21,25 +21,21 @@ final class RegUITests: XCTestCase {
 
     func testPositiveRegistration() throws {
         XCTContext.runActivity(named: "Тест: регистрации нового пользователя") { _ in
-            let app = XCUIApplication()
-            let loginPage = LoginPage(app: app)
-            let regPage = RegPage(app: app)
-            let newSpendsPage = NewSpendPage(app: app)
-            
+    
             // Arrange
             loginPage.launchAppWithoutLogin()
             
             //act
             regPage.tapCreateNewAccount()
-            regPage.fillRegForm(userName: uniqueUserName, password: uniquePassword, confirmPassword: uniquePassword)
+                     .fillRegForm(userName: uniqueUserName, password: uniquePassword, confirmPassword: uniquePassword)
+            
+            // Assert
             loginPage.logInInAlert()
+                     .assertFieldUserNameEqual(userName:uniqueUserName)
+                      .pressLoginButton()
             
             // Assert
-            loginPage.assertFieldUserNameEqual(userName: uniqueUserName)
-            loginPage.pressLoginButton()
-            
-            // Assert
-            newSpendsPage.assertIsAddSpendButtonShown()
+            newSpendPage.assertIsAddSpendButtonShown()
         }
     }
     
@@ -48,62 +44,53 @@ final class RegUITests: XCTestCase {
     func testCreateCategoryAfterReg() throws {
         XCTContext.runActivity(named: "Тест: Создание категории после регистрации") { _ in
             
-            let app = XCUIApplication()
-            let loginPage = LoginPage(app: app)
-            let regPage = RegPage(app: app)
-            let newSpendsPage = NewSpendPage(app: app)
-            
             
             // Arrange
             loginPage.launchAppWithoutLogin()
             
             //act
             regPage.tapCreateNewAccount()
-            regPage.fillRegForm(userName: uniqueUserName, password: uniquePassword, confirmPassword: uniquePassword)
-            loginPage.logInInAlert()
-            loginPage.assertFieldUserNameEqual(userName: uniqueUserName)
-            loginPage.pressLoginButton()
-            newSpendsPage.assertIsAddSpendButtonShown()
-            newSpendsPage.assertEmptySpendItem()
-            newSpendsPage.addSpent()
-            newSpendsPage.addNewCategory()
-            newSpendsPage.inputNameCategory(nameCategory: "Еда")
-            newSpendsPage.inputAmount(amount: "1000")
-            newSpendsPage.inputDescription(description: "Бананы")
-            newSpendsPage.pressAddSpend()
+                    .fillRegForm(userName: uniqueUserName, password: uniquePassword, confirmPassword: uniquePassword)
             
-            // Assert
-            newSpendsPage.assertNewSpendIsShown(title: "Бананы")
+            loginPage.logInInAlert()
+                     .assertFieldUserNameEqual(userName: uniqueUserName)
+                     .pressLoginButton()
+            
+            newSpendPage.assertIsAddSpendButtonShown()
+                        .assertEmptySpendItem()
+                        .addSpent()
+                        .addNewCategory()
+                        .inputNameCategory(nameCategory: "Еда")
+                        .inputAmount(amount: "1000")
+                        .inputDescription(description: "Бананы")
+                        .pressAddSpend()
+                        .assertNewSpendIsShown(title: "Бананы")
         }
     }
     
     func testChooseCategoryAfterReg() throws {
         XCTContext.runActivity(named: "Тест: Выбор категории после регистрации") { _ in
             
-            
-            let app = XCUIApplication()
-            let loginPage = LoginPage(app: app)
-            let regPage = RegPage(app: app)
-            let newSpendsPage = NewSpendPage(app: app)
-            
             // Arrange
             loginPage.launchAppWithoutLogin()
             
             //act
             regPage.tapCreateNewAccount()
-            regPage.fillRegForm(userName: uniqueUserName, password: uniquePassword, confirmPassword: uniquePassword)
+                   .fillRegForm(userName: uniqueUserName, password: uniquePassword, confirmPassword: uniquePassword)
+            
             loginPage.logInInAlert()
-            loginPage.assertFieldUserNameEqual(userName: uniqueUserName)
-            loginPage.pressLoginButton()
-            newSpendsPage.assertIsAddSpendButtonShown()
-            newSpendsPage.assertEmptySpendItem()
-            newSpendsPage.addSpent()
-            newSpendsPage.inputAmount(amount: "1000")
-            newSpendsPage.inputDescription(description: "Бананы")
-            newSpendsPage.pressAddSpend()
+                     .assertFieldUserNameEqual(userName: uniqueUserName)
+                     .pressLoginButton()
+            
+            newSpendPage.assertIsAddSpendButtonShown()
+                         .assertEmptySpendItem()
+                         .addSpent()
+                         .inputAmount(amount: "1000")
+                         .inputDescription(description: "Бананы")
+                         .pressAddSpend()
             
             // Assert
-            newSpendsPage.assertNewSpendIsShown(title: "Бананы")
+                          .assertNewSpendIsShown(title: "Бананы")
         }
     }
     

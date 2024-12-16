@@ -9,15 +9,18 @@ import XCTest
 
 final class RegPage: BasePage {
 
-     func tapCreateNewAccount() {
+    func tapCreateNewAccount() -> Self{
         XCTContext.runActivity(named: "Тапаем на кнопку создания аккаунта") { _ in
             app.staticTexts["Create new account"].tap()
+            return self
         }
     }
     
-     func tapSignUp() {
+    @discardableResult
+     func tapSignUp() -> Self{
         XCTContext.runActivity(named: "Тапаем на кнопку Регистрации") { _ in
             app.buttons["Sign Up"].tap()
+            return self
         }
     }
     
