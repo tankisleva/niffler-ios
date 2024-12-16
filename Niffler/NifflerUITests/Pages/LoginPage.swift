@@ -12,7 +12,7 @@ class LoginPage: BasePage {
         return self
     }
     
-    private func input(login: String) {
+     func input(login: String) {
         XCTContext.runActivity(named: "Ввожу логин \(login)") { _ in
             app.textFields["userNameTextField"].tap()
             app.textFields["userNameTextField"].tap() // TODO: Remove the cause of double tap
@@ -20,14 +20,14 @@ class LoginPage: BasePage {
         }
     }
     
-    private func input(password: String) {
+     func input(password: String) {
         XCTContext.runActivity(named: "Ввожу пароль \(password)") { _ in
             app.secureTextFields["passwordTextField"].tap()
             app.secureTextFields["passwordTextField"].typeText(password)
         }
     }
     
-    private func pressLoginButton() {
+     func pressLoginButton() {
         XCTContext.runActivity(named: "Жму кнопку логина") { _ in
             app.buttons["loginButton"].tap()
         }
@@ -59,4 +59,19 @@ class LoginPage: BasePage {
                           file: file, line: line)
         }
     }
+    
+     func assertFieldUserNameEqual(userName: String) {
+        XCTContext.runActivity(named: "Сравниваем что введенный нами \(userName) равен значению из заполненного поля с юзер неймом") { _ in
+            let userNameFromField = app.textFields["userNameTextField"].firstMatch.value
+            XCTAssertEqual( userNameFromField as! String, userName)
+        }
+    }
+    
+     func logInInAlert() {
+        XCTContext.runActivity(named: "Тапаем на Log in в алерте") { _ in
+            app.alerts.buttons["Log in"].firstMatch.tap()
+        }
+    }
+    
+    
 }
